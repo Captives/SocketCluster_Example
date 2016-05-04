@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+    <title>SocketCluster Client</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <style>
+        h2, h3,h4 {
+            color: #FFFFFF;
+        }
+    </style>
+    <script src="js/libs/jquery.min.js"></script>
+    <script src="js/libs/bootstrap.min.js"></script>
+    <script src="js/libs/socketcluster.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">SocketCluster <small id="pid"></small><small id="num"></small></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li><h3><small><span id="time"></span></small></h3></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <form class="form-horizontal">
+                <fieldset>
+                    <div class="form-group">
+                        <label for="inputName" class="col-lg-2 control-label">NAME</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="inputName" placeholder="请输入昵称" value="哈哈哈">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-lg-10">
+                            <button id="connBtn" type="button" class="col-md-5 btn btn-info">登入系统</button>
+                            <button id="outBtn" type="button" class="col-md-5 btn btn-danger">登出系统</button>
+
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <!--<legend>ENTER ROOM</legend>-->
+                    <div class="room form-group">
+                        <label for="inputRoom" class="col-lg-2 control-label">ROOM</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" id="inputRoom" placeholder="请输入房间号" value="TD001">
+                        </div>
+                    </div>
+
+                    <div class="room form-group">
+                        <div class="col-lg-10">
+                            <button id="subBtn" type="button" class="col-md-5 btn btn-success"> 订阅通道 </button>
+                            <span class="col-md-2"></span>
+                            <button id="unsubBtn" type="button" class="col-md-5 btn btn-warning"> 取消订阅 </button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <!--聊天区域--->
+        <div class="col-md-8">
+            <div class="chat form-group has-success">
+                <div class="input-group">
+                    <input id="inputText" type="text" class="form-control">
+                    <span class="input-group-btn">
+                        <button id="sBtn" class="btn btn-warning" type="button">单点</button>
+                        <button id="sendBtn" class="btn btn-success" type="button">发送</button>
+                        <button id="broBtn" type="submit" class="btn btn-info">群发</button>
+                    </span>
+                </div>
+            </div>
+            <div class="panel panel-info">
+                <div class="modal-header panel-heading">
+                    <button id="clearBtn" type="button" class="close">&times;</button>
+                    <h3 class="panel-title">MESSAGE</h3>
+                </div>
+                <div id="msgList" class="panel-body">
+                    <div class="checkbox blockquote-reverse">
+                        <label>
+                            <input id="checkBox" type="checkbox"> Message 监视
+                        </label>
+                    </div>
+                    <ul></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/WebServer-client.js"></script>
+<script src="js/main.js"></script>
+</html>
