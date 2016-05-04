@@ -15,6 +15,16 @@ function addMessage(text){
     $('#msgList > ul').append(li);
 }
 
+$('#clearBtn').on('click', function () {
+    $('#msgList > ul').empty();
+});
+
 $(document).ready(function () {
     server.connect();
+});
+
+server.on('message', function (data) {
+    if($('#checkBox').is(':checked')){
+        console.log('[Main]------ message -------',data);
+    }
 });

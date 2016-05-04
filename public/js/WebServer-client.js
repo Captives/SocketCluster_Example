@@ -1,17 +1,17 @@
 function WebServerUtils() {
     this.webServerClient = null;
     function WebServerClient() {
-        this.ws = null;
         this.remote = null;
-        this.connected = false;
         this.data = null;
     }
 
+    WebServerClient.prototype = new EventEmitter();
     /**********************************************************
      *  单例模式对象
      **********************************************************/
 
     WebServerClient.prototype.connect = function () {
+        var that = this;
         this.remote = new RemoteClient({
             path:'/socket'
         });
@@ -21,7 +21,16 @@ function WebServerUtils() {
             alert(data.text);
         });
 
-        // Listen to an event called 'rand' from the server
+        socket.on('connect', function (status) {
+            that.subscribeTime("time");
+        });
+
+        //消息
+        socket.on('message', function (data) {
+            that.emit('message',data);
+            //console.log('------ message -------',data);
+        });
+
         socket.on('time', function (data) {
             var date = new Date();
             date.setTime = data.time;
@@ -32,6 +41,17 @@ function WebServerUtils() {
         //登录成功
         socket.on("success", function (data) {
            $('#pid').html("进程ID:" + data.pid);
+        });
+    };
+
+    WebServerClient.prototype.subscribeTime = function (name) {
+        if(this.remote.isSubscribed(name)){
+            return this.emit('error',new Error("名称为" + name +"通道已经被订阅了！不需要重复订阅"));
+        }
+
+        var channel = this.remote.subscribe(name);
+        channel.watch(function (data) {
+            console.log(JSON.stringify(data));
         });
     };
 
@@ -55,9 +75,6 @@ function RemoteClient(options) {
         }
     });
 
-    socket.on('connect', function (status) {
-
-    });
     //连接中断
     socket.on('connectAbort', function (code) {
         console.log('------连接中断 connectAbort -------',code);
@@ -118,13 +135,15 @@ function RemoteClient(options) {
         console.log('------解除验证 deauthenticate -------',data);
     });
 
-    //消息
-    socket.on('message', function (data) {
-        console.log('------ message -------',data);
-    });
-
     //断开
     socket.on("disconnect", function () {
         console.log(' --------- UNCONNECTED  -----------');
     });
+};
+
+RemoteClient.prototype.isSubscribed = function (name) {
+    return this.webSocket.isSubscribed(name);
+};
+RemoteClient.prototype.subscribe = function (name) {
+    return this.webSocket.subscribe(name);
 };

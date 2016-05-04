@@ -38,9 +38,10 @@ WebServer.prototype.init = function (socket) {
     socket.on('message', function (json) {
         //console.log('------ socket # message -------',data);
         if (json.eventName) {
+            console.log("EventName", json.eventName);
             that.emit(json.eventName, socket, json.data);
         } else {
-            that.emit("message", ws, json);
+            that.emit("message", socket, json);
         }
     });
 

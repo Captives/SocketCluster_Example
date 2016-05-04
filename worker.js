@@ -17,6 +17,7 @@ module.exports.run = function(worker) {
     //app.use(serveStatic(path.resolve(__dirname, 'node_modules/socketcluster-client')));
     httpServer.on('request', app);
 
+    var channel = scServer.exchange;
     /***************************************************************************
      *
      * 业务事件
@@ -24,7 +25,7 @@ module.exports.run = function(worker) {
     ****************************************************************************/
     var webServer = WebServer.attach(scServer);
     webServer.on('new_socket', function (socket) {
-        console.log("服务器socket", scServer.clientsCount,  Object.keys(scServer.clients).length);
+        console.log("服务器  客户端数量", scServer.clientsCount, "Clients = " + Object.keys(scServer.clients).length);
         console.log("client " + socket.id + " has connected # pid=", process.pid);
     });
 
@@ -34,11 +35,11 @@ module.exports.run = function(worker) {
      *
     ****************************************************************************/
     //建立一个通道向订阅的客户端发送服务器时间
-    setInterval(function () {
-        scServer.exchange.publish('time',{
-            time:Date.now(),
-            client:Object.keys(scServer.clients).length,
-        });
-    }, 1000);
-
+    //setInterval(function () {
+    //    channel.publish('time',{
+    //        time:Date.now(),
+    //        pid: process.pid,
+    //        client:Object.keys(scServer.clients).length,
+    //    });
+    //}, 1000);
 };
