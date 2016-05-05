@@ -20,7 +20,6 @@ WebServer.init = function (socket, data) {
 
 WebServer.join = function (socket, data) {
     socket.emit('success',{text:"登录成功"});
-    console.log("[WEBSERVER]---------join----------------");
 };
 
 WebServer.share = function (socket, data) {

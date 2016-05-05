@@ -20,9 +20,14 @@ $('#clearBtn').on('click', function () {
 });
 
 $(document).ready(function () {
-    server.connect({
-        path:'/socket'
-    });
+    var options = {
+        protocol: 'http',
+        hostname: '192.168.10.31',
+        port: 80,
+        path:"/SocketCluster"
+    };
+
+    server.connect(options);
 });
 
 server.on('message', function (data) {

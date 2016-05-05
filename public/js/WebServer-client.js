@@ -1,35 +1,34 @@
 function WebServerUtils() {
     this.webServerClient = null;
     function WebServerClient() {
-        this.data = null;
-        this.channelTime = null;
+        //this.channelTime = null;
     }
 
     WebServerClient.prototype = new RemoteClient();
     /**********************************************************
      *  单例模式对象
      **********************************************************/
-
-    WebServerClient.prototype.subscribeTime = function (name) {
-        if(this.isSubscribed(name)){
-            return this.emit('error',new Error("名称为" + name +"通道已经被订阅了！不需要重复订阅"));
-        }
-
-        this.channelTime = this.subscribe(name);
-        this.channelTime.watch(function (data) {
-            console.log(JSON.stringify(data));
-        });
-    };
-
-    WebServerClient.prototype.unSubscribeTime = function (name) {
-        if(!this.isSubscribed(name)){
-            return this.emit('error',new Error("名称为" + name +"通道未被订阅！当前操作已取消"));
-        }
-
-        this.channelTime.unwatch(function(){
-
-        });
-    };
+    //
+    //WebServerClient.prototype.subscribeTime = function (name) {
+    //    if(this.isSubscribed(name)){
+    //        return this.emit('error',new Error("名称为" + name +"通道已经被订阅了！不需要重复订阅"));
+    //    }
+    //
+    //    this.channelTime = this.subscribe(name);
+    //    this.channelTime.watch(function (data) {
+    //        console.log(JSON.stringify(data));
+    //    });
+    //};
+    //
+    //WebServerClient.prototype.unSubscribeTime = function (name) {
+    //    if(!this.isSubscribed(name)){
+    //        return this.emit('error',new Error("名称为" + name +"通道未被订阅！当前操作已取消"));
+    //    }
+    //
+    //    this.channelTime.unwatch(function(){
+    //
+    //    });
+    //};
 
     /**********************************************************
      *  单例模式对象
@@ -43,15 +42,20 @@ function WebServerUtils() {
 
 function RemoteClient() {
     this.socket = null;
+    this.isAuthenticated = false;
 };
 
 RemoteClient.prototype = new EventEmitter();
 
-RemoteClient.prototype.connect = function (options,data) {
+RemoteClient.prototype.connect = function (options) {
     var that = this;
     var socket = this.socket = socketCluster.connect(options);
     socket.on('connect', function (status) {
-        that.login({name:'张三',room:1000,uid:111});
+        that.isAuthenticated = status.isAuthenticated;
+        that.emit('socket_open',status);
+        if(!that.isAuthenticated){
+            that.login({account:18388886666});
+        }
         console.log('------ connect -------',JSON.stringify(status));
     });
 
@@ -87,12 +91,12 @@ RemoteClient.prototype.connect = function (options,data) {
 
     //认证状态更改
     socket.on('authStateChange', function (data) {
-        console.log('------认证状态更改 authStateChange -------',data);
+        console.log('------认证状态更改 authStateChange -------',JSON.stringify(data));
     });
 
     //移除认证
     socket.on("removeAuthToken", function (data) {
-        isAuthenticated = false;
+        that.isAuthenticated = false;
         console.log('------移除认证 removeAuthToken -------',data);
     });
 
@@ -131,6 +135,10 @@ RemoteClient.prototype.connect = function (options,data) {
         console.log(' --------- UNCONNECTED  -----------');
     });
 
+    socket.on('error', function (err) {
+        console.log(err);
+    });
+
     socket.on('reject', function (data) {
         console.log('reject',data.text);
     });
@@ -145,8 +153,15 @@ RemoteClient.prototype.subscribe = function (name) {
 };
 
 RemoteClient.prototype.login = function (data) {
-    this.socket.emit('join', data, function (err, failure) {
-        
+    var that = this;
+    this.socket.emit('join', data, function (err, data) {
+        if(err){
+            console.log(err);
+            that.isAuthenticated = false;
+        }else{
+            that.isAuthenticated = true;
+            console.log(JSON.stringify(data));
+        }
     });
 };
 

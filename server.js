@@ -8,7 +8,7 @@ var socketCluster = new SocketCluster({
     port: Number(argv.p) || 80,
     appName: argv.n || 'example',
     logLevel:1,
-    path:'/socket',
+    path:'/SocketCluster',
     workerController: __dirname + '/worker.js',
     brokerController: __dirname + '/broker.js',
     crashWorkerOnError: argv['auto-reboot'] != false,
@@ -37,23 +37,3 @@ socketCluster.on('workerMessage', function (data) {
 socketCluster.on('brokerMessage', function (data) {
     console.log('socketCluster # brokerMessage',data);
 });
-
-/**
-var socketCluster2 = new SocketCluster({
-    brokers: Number(argv.b) || cpus.length,
-    workers: Number(argv.w) || cpus.length,
-    balancers: Number(argv.b) || 1,
-    stores: Number(argv.s) || 1,
-    port: Number(argv.p) || 3000,
-    appName: argv.n || 'example2',
-    logLevel:1,
-    path:'/socket',
-    workerController: __dirname + '/worker.js',
-    brokerController: __dirname + '/broker.js',
-    balancerController: __dirname + '/balancer.js',
-    storeController: __dirname + '/store.js',
-    crashWorkerOnError: argv['auto-reboot'] != false,
-    socketChannelLimit: 1000,
-    rebootWorkerOnCrash: false
-});
-**/

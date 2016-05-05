@@ -14,6 +14,16 @@ module.exports.run = function(worker) {
     scServer.webServer = WebServer;
     AccessControl.attach(scServer);
     var app = express();
+    var mysql = require('mysql');
+    var pool = mysql.createPool({
+        connectionLimit: 500,
+        host: "192.168.10.25",
+        user: "root",
+        password: "123456",
+        database: "example",
+        debug: false
+    });
+
     app.use(Router.attach(express));
     app.use(serveStatic(path.resolve(__dirname, 'public')));
     //app.use(serveStatic(path.resolve(__dirname, 'node_modules/socketcluster-client')));
@@ -26,10 +36,10 @@ module.exports.run = function(worker) {
      *
     ****************************************************************************/
     scServer.on('connection', function (socket) {
-        Auth.attach(socket);//身份验证的中间件
+        Auth.attach(pool, socket);//身份验证的中间件
         //消息
         socket.on('message', function (json) {
-            // console.log('------ socket # message -------',data);
+             console.log('------ socket # message -------',json);
         });
 
         socket.on('raw', function (data) {
@@ -60,7 +70,7 @@ module.exports.run = function(worker) {
 
         //错误
         socket.on('error', function (err) {
-            console.error(err);
+           // console.error(err);
         });
     });
 
