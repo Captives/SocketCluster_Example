@@ -17,7 +17,9 @@ var socketCluster = new SocketCluster({
 });
 
 socketCluster.on('ready', function () {
-    console.log('socketCluster # ready');
+    console.log('SocketCluster startup success');
+    console.log("Open your browser to access http://localhost:%s",socketCluster.options.port);
+    console.log("Client connection ws://localhost:%s%s",socketCluster.options.port,socketCluster.options.path);
 });
 
 socketCluster.on('fail', function (data) {

@@ -1,10 +1,11 @@
 module.exports.attach = function (scServer) {
+    var webServer = scServer.webServer;
     //握手
     scServer.addMiddleware(scServer.MIDDLEWARE_HANDSHAKE, function (req, next) {
         //console.log('middleware_handshake', req.remoteAddress,req.headers);
         if(req.headers.host == "192.168.10.131"){
             console.log("拒绝连接", process.pid);
-            req.socket.emit('logout',{text:"黑名单用户,不能登录"});
+            req.socket.emit('reject',{text:"黑名单用户,不能登录"});
         }else{
             next();
         }
@@ -28,9 +29,17 @@ module.exports.attach = function (scServer) {
         next();
     });
 
-    //事件派发
+    //事件派发 ## 这里处理我自己的业务事件，外层只需要控制
     scServer.addMiddleware(scServer.MIDDLEWARE_EMIT, function (req, next) {
-        //console.log('middleware_emit',req.socket.id, req.event, req.data);
+        try{
+            console.log('middleware_emit',req.socket.id, req.event, req.data);
+            //拦截事件处理业务
+            //webServer.emit(req.event, req.socket, req.data);
+            webServer[req.event](req.socket,req.data);
+        }catch(e){
+            req.socket.emit('reject',{text:"无效的业务事件"});
+            console.error("无效的业务事件", req.event, req.data);
+        }
         next();
     });
 

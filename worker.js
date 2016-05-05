@@ -4,13 +4,15 @@ var path = require('path');
 var WebServer = require('./server/SocketClusterWebserver.js');
 var AccessControl = require('./sc_module/access-control.js');
 var Router = require('./sc_module/Router.js');
+var Auth = require('./sc_module/authentication.js');
 
 module.exports.run = function(worker) {
     console.log(" >> Worker PID:", process.pid);
     var httpServer = worker.httpServer;
     var scServer = worker.scServer;
-    AccessControl.attach(scServer);
 
+    scServer.webServer = WebServer;
+    AccessControl.attach(scServer);
     var app = express();
     app.use(Router.attach(express));
     app.use(serveStatic(path.resolve(__dirname, 'public')));
@@ -23,10 +25,43 @@ module.exports.run = function(worker) {
      * 业务事件
      *
     ****************************************************************************/
-    var webServer = WebServer.attach(scServer);
-    webServer.on('new_socket', function (socket) {
-        console.log("服务器  客户端数量", scServer.clientsCount, "Clients = " + Object.keys(scServer.clients).length);
-        console.log("client " + socket.id + " has connected # pid=", process.pid);
+    scServer.on('connection', function (socket) {
+        Auth.attach(socket);//身份验证的中间件
+        //消息
+        socket.on('message', function (json) {
+            // console.log('------ socket # message -------',data);
+        });
+
+        socket.on('raw', function (data) {
+            console.log('------ socket # raw -------',data);
+        });
+
+        //断开
+        socket.on('disconnect', function (data) {
+            //scServer.webServer.emit('disconnect',socket, data);
+            scServer.webServer['disconnect'](socket, data);
+            console.log("Client " + socket.id + " socket has disconnected!");
+        });
+
+        //订阅
+        socket.on('subscribe', function (name) {
+            console.log('------ socket # subscribe -------',name);
+        });
+
+        //取消订阅
+        socket.on('unsubscribe', function (name) {
+            console.log('------ socket # unsubscribe -------',name);
+        });
+
+        //失败验证
+        socket.on('badAuthToken', function (data) {
+            console.log('------ socket # badAuthToken -------',data);
+        });
+
+        //错误
+        socket.on('error', function (err) {
+            console.error(err);
+        });
     });
 
     /***************************************************************************
@@ -36,6 +71,7 @@ module.exports.run = function(worker) {
     ****************************************************************************/
     //建立一个通道向订阅的客户端发送服务器时间
     //setInterval(function () {
+    //    scServer.webServer['syncTime'](channel, Date.now(), process.pid, Object.keys(scServer.clients).length);
     //    channel.publish('time',{
     //        time:Date.now(),
     //        pid: process.pid,

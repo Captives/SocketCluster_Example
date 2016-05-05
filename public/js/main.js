@@ -20,11 +20,17 @@ $('#clearBtn').on('click', function () {
 });
 
 $(document).ready(function () {
-    server.connect();
+    server.connect({
+        path:'/socket'
+    });
 });
 
 server.on('message', function (data) {
     if($('#checkBox').is(':checked')){
         console.log('[Main]------ message -------',data);
     }
+});
+
+server.on('success', function (json) {
+    console.log("success ========",JSON.stringify(json));
 });

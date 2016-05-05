@@ -1,57 +1,33 @@
 function WebServerUtils() {
     this.webServerClient = null;
     function WebServerClient() {
-        this.remote = null;
         this.data = null;
+        this.channelTime = null;
     }
 
-    WebServerClient.prototype = new EventEmitter();
+    WebServerClient.prototype = new RemoteClient();
     /**********************************************************
      *  单例模式对象
      **********************************************************/
 
-    WebServerClient.prototype.connect = function () {
-        var that = this;
-        this.remote = new RemoteClient({
-            path:'/socket'
-        });
-
-        var socket = this.remote.webSocket;
-        socket.on('logout', function (data) {
-            alert(data.text);
-        });
-
-        socket.on('connect', function (status) {
-            that.subscribeTime("time");
-        });
-
-        //消息
-        socket.on('message', function (data) {
-            that.emit('message',data);
-            //console.log('------ message -------',data);
-        });
-
-        socket.on('time', function (data) {
-            var date = new Date();
-            date.setTime = data.time;
-            $('#time').html(date.toLocaleDateString() + date.toLocaleTimeString());
-            $('#pid').html("client="+data.client);
-        });
-
-        //登录成功
-        socket.on("success", function (data) {
-           $('#pid').html("进程ID:" + data.pid);
-        });
-    };
-
     WebServerClient.prototype.subscribeTime = function (name) {
-        if(this.remote.isSubscribed(name)){
+        if(this.isSubscribed(name)){
             return this.emit('error',new Error("名称为" + name +"通道已经被订阅了！不需要重复订阅"));
         }
 
-        var channel = this.remote.subscribe(name);
-        channel.watch(function (data) {
+        this.channelTime = this.subscribe(name);
+        this.channelTime.watch(function (data) {
             console.log(JSON.stringify(data));
+        });
+    };
+
+    WebServerClient.prototype.unSubscribeTime = function (name) {
+        if(!this.isSubscribed(name)){
+            return this.emit('error',new Error("名称为" + name +"通道未被订阅！当前操作已取消"));
+        }
+
+        this.channelTime.unwatch(function(){
+
         });
     };
 
@@ -60,18 +36,33 @@ function WebServerUtils() {
      **********************************************************/
     if (this.webServerClient === null) {
         this.webServerClient = new WebServerClient();
-        console.log("WebSocket Client init");
+        console.log("SocketCluster Client init");
     }
     return this.webServerClient;
 };
 
-function RemoteClient(options) {
-    var socket = socketCluster.connect(options);
-    Object.defineProperties(this,{
-        "webSocket":{
-            get:function(){
-                return socket;
-            }
+function RemoteClient() {
+    this.socket = null;
+};
+
+RemoteClient.prototype = new EventEmitter();
+
+RemoteClient.prototype.connect = function (options,data) {
+    var that = this;
+    var socket = this.socket = socketCluster.connect(options);
+    socket.on('connect', function (status) {
+        that.login({name:'张三',room:1000,uid:111});
+        console.log('------ connect -------',JSON.stringify(status));
+    });
+
+    //消息
+    socket.on('message', function (text) {
+        console.log(text);
+        var json = JSON.parse(text);
+        if(json.event){
+            that.emit(json.event, json.data, json.cid);
+        }else{
+            that.emit('message',json);
         }
     });
 
@@ -139,11 +130,23 @@ function RemoteClient(options) {
     socket.on("disconnect", function () {
         console.log(' --------- UNCONNECTED  -----------');
     });
+
+    socket.on('reject', function (data) {
+        console.log('reject',data.text);
+    });
 };
 
 RemoteClient.prototype.isSubscribed = function (name) {
-    return this.webSocket.isSubscribed(name);
+    return this.socket.isSubscribed(name);
 };
+
 RemoteClient.prototype.subscribe = function (name) {
-    return this.webSocket.subscribe(name);
+    return this.socket.subscribe(name);
 };
+
+RemoteClient.prototype.login = function (data) {
+    this.socket.emit('join', data, function (err, failure) {
+        
+    });
+};
+
