@@ -2,7 +2,7 @@ SocketCluster Sample App
 ==========
 <img src="https://avatars2.githubusercontent.com/u/16425764?v=3&s=460"/>
 
-<h4>CLOSE DESCRIPTIONS</h4>
+<h4>Close descriptions</h4>
 ```
     1000: 'Normal connection closure',
     1001: 'Remote peer is going away',
@@ -19,7 +19,7 @@ SocketCluster Sample App
     1015: 'TLS Handshake Failed'
 ```
 
-<h4>socket Protocol Error Statuses</h4>
+<h4>Socket Protocol Error Statuses</h4>
 ```
     1001: 'Socket was disconnected',
     1002: 'A WebSocket protocol error was encountered',
