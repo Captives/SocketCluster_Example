@@ -31,7 +31,10 @@ $(document).ready(function () {
 });
 
 server.on('time', function (data) {
-        console.log('[Main]------ time -------',data);
+    var date = new Date();
+    date.setTime = data.time;
+    $('#time').html(date.toLocaleDateString() + date.toLocaleTimeString());
+    $('#pid').html("client="+data.client);
 });
 
 server.on('message', function (data) {

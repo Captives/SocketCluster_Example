@@ -64,10 +64,10 @@ RemoteClient.prototype.connect = function (options) {
         try{
             var json = JSON.parse(text);
             if(json.event){
-                console.log("$$EVENT", text, JSON.stringify(json));
+                // console.log("$$EVENT", text, JSON.stringify(json));
                 that.emit(json.event, json.data, json.cid);
             }else{
-                console.log("$$MESSAGE", text, JSON.stringify(json));
+                // console.log("$$MESSAGE", text, JSON.stringify(json));
                 that.emit('message',json);
             }
 
