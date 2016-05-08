@@ -9,6 +9,7 @@ SocketCluster Sample App
 <h3>Error Code:</h3>
 
 <h4>Close descriptions</h4>
+
 ```
     1000: 'Normal connection closure',
     1001: 'Remote peer is going away',

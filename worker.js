@@ -36,7 +36,16 @@ module.exports.run = function(worker) {
      *
     ****************************************************************************/
     scServer.on('connection', function (socket) {
-        Auth.attach(pool, socket);//身份验证的中间件
+        setInterval(function () {
+            socket.emit('time',{
+                time:Date.now(),
+                pid: process.pid,
+                client:Object.keys(scServer.clients).length,
+            });
+        },1000);
+
+
+         Auth.attach(pool, socket);//身份验证的中间件
         //消息
         socket.on('message', function (json) {
              console.log('------ socket # message -------',json);
@@ -48,7 +57,7 @@ module.exports.run = function(worker) {
 
         //断开
         socket.on('disconnect', function (data) {
-            //scServer.webServer.emit('disconnect',socket, data);
+            // scServer.webServer.emit('disconnect',socket, data);
             scServer.webServer['disconnect'](socket, data);
             console.log("Client " + socket.id + " socket has disconnected!");
         });

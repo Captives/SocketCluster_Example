@@ -30,6 +30,10 @@ $(document).ready(function () {
     server.connect(options);
 });
 
+server.on('time', function (data) {
+        console.log('[Main]------ time -------',data);
+});
+
 server.on('message', function (data) {
     if($('#checkBox').is(':checked')){
         console.log('[Main]------ message -------',data);
