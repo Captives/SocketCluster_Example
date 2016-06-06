@@ -74,8 +74,6 @@ RemoteClient.prototype.connect = function (options) {
         }catch(e){
             console.log("##", text);
         }
-
-
     });
 
     //连接中断

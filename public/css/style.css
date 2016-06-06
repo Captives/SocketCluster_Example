@@ -1,0 +1,12 @@
+@font-face{
+    font-family: "timeFont";               /*自定义字体名称*/
+    src:url("./../fonts/DS-DIGI.TTF") format("truetype");     /*Safari,Android,iOS*/
+    font-weight: normal;
+    font-style: normal;
+}
+
+.time{
+    font-family: timeFont;
+    color: #ffffff;
+    font-size: 0.8cm;
+}

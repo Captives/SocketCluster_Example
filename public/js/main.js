@@ -22,7 +22,7 @@ $('#clearBtn').on('click', function () {
 $(document).ready(function () {
     var options = {
         protocol: 'http',
-        hostname: '192.168.10.31',
+        hostname: 'localhost',
         port: 80,
         path:"/SocketCluster"
     };
